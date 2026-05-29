@@ -42,7 +42,7 @@ document.getElementById('menu-projects').addEventListener('click', () => showScr
 document.getElementById('menu-about').addEventListener('click', () => showScreen(boxAbout));
 document.getElementById('menu-contacts').addEventListener('click', () => showScreen(boxContacts));
 
-// ИСПРАВЛЕНО: Клик по кнопке Главная теперь реально работает
+// Клик по кнопке Главная теперь реально работает
 document.getElementById('menu-main').addEventListener('click', () => {
     showScreen(boxMessenger);
     renderMessenger();
