@@ -44,7 +44,6 @@ if (document.getElementById('menu-main')) {
 
 function getStorage(key) { return JSON.parse(localStorage.getItem(key) || '[]'); }
 function setStorage(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
-
 function renderMessenger() {
     if (!messengerView) return;
     messengerView.innerHTML = '';
