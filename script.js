@@ -1,6 +1,7 @@
 const SUPABASE_URL = 'https://supabase.co';
 const SUPABASE_KEY = 'sb_publishable_bhx6sfmyZOYixc6RNARoeg_6SXEB_2b6ec26a42207908901a88dfb841a100ce643690c7eb1dfbb09206771d371d3a';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// Добавлена проверка на случай сбоя сети
+const supabase = (window.supabase && window.supabase.createClient) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
 let currentUser = null;
 let activeChatFriend = null;
@@ -15,6 +16,7 @@ const boxMessenger = document.getElementById('box-messenger');
 const messengerView = document.getElementById('messenger-view');
 
 function showScreen(screen) {
+    if(!mainTitle || !mainMenu || !boxProjects || !boxAbout || !boxContacts || !boxMessenger) return;
     mainTitle.classList.add('hidden');
     mainMenu.classList.add('hidden');
     boxProjects.classList.add('hidden');
@@ -35,7 +37,7 @@ document.querySelectorAll('.to-menu').forEach(btn => {
 const backBtn = document.getElementById('messenger-back-btn');
 if (backBtn) {
     backBtn.addEventListener('click', () => {
-        if (messageSubscription) supabase.removeChannel(messageSubscription);
+        if (messageSubscription && supabase) supabase.removeChannel(messageSubscription);
         showScreen(mainMenu);
     });
 }
@@ -59,6 +61,11 @@ if (mMain) {
 async function renderMessenger() {
     if (!messengerView) return;
     messengerView.innerHTML = '';
+    
+    if (!supabase) {
+        messengerView.innerHTML = '<div style="color:red;">Ошибка подключения к базе данных. Попробуйте обновить страницу.</div>';
+        return;
+    }
     
     let session = null;
     try {
@@ -95,6 +102,7 @@ async function renderMessenger() {
 }
 
 async function register() {
+    if (!supabase) return;
     const emailInput = document.getElementById('auth-email');
     const passInput = document.getElementById('auth-password');
     const userInput = document.getElementById('auth-username');
@@ -117,6 +125,7 @@ async function register() {
 }
 
 async function login() {
+    if (!supabase) return;
     const emailInput = document.getElementById('auth-email');
     const passInput = document.getElementById('auth-password');
     
@@ -129,6 +138,7 @@ async function login() {
 }
 
 async function sendFriendRequest() {
+    if (!supabase) return;
     const input = document.getElementById('friend-id-input');
     const targetCustomId = input ? input.value.trim() : '';
     if(!targetCustomId) return;
@@ -143,6 +153,7 @@ async function sendFriendRequest() {
 }
 
 async function loadFriendsList() {
+    if (!supabase) return;
     const containerList = document.getElementById('friends-list-container');
     if(!containerList) return;
 
@@ -195,6 +206,7 @@ async function loadFriendsList() {
 }
 
 function openChatWindow(friendProfile) {
+    if (!supabase) return;
     activeChatFriend = friendProfile;
     const layout = document.getElementById('chat-layout-view');
     if (!layout) return;
@@ -224,6 +236,7 @@ function openChatWindow(friendProfile) {
 }
 
 async function loadMessages() {
+    if (!supabase) return;
     const box = document.getElementById('chat-messages-box');
     if(!box) return;
 
@@ -242,6 +255,7 @@ async function loadMessages() {
 }
 
 async function sendMessage() {
+    if (!supabase) return;
     const input = document.getElementById('chat-msg-input');
     const text = input ? input.value.trim() : '';
     if(!text) return;
