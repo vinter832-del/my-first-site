@@ -23,9 +23,7 @@
         }
         h1:hover { transform: scale(1.05); text-shadow: 0 0 25px rgba(255, 255, 255, 0.4); }
         
-        .menu-container {
-            display: flex; flex-direction: column; align-items: center; gap: 20px;
-        }
+        .menu-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
         .menu-item {
             font-size: 1.8rem; font-family: 'Arial Black', sans-serif; color: #888888;
             text-transform: uppercase; letter-spacing: 4px; padding: 10px 40px;
@@ -72,47 +70,40 @@
 
         .hidden { display: none !important; }
     </style>
-    <!-- Подключаем официальную библиотеку базы данных -->
-    <script src="https://jsdelivr.net"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <div id="content">
-        <!-- 1. Стартовый экран -->
         <h1 id="main-title">ВИНТЕР</h1>
 
-        <!-- 2. Главное меню -->
         <div id="main-menu" class="menu-container hidden">
+            <!-- ТУТ ВСЁ ИСПРАВЛЕНО, ID СОВПАДАЕТ С JS СТРОГО -->
             <div class="menu-item" id="menu-main">Главная</div>
             <div class="menu-item" id="menu-projects">Проекты</div>
             <div class="menu-item" id="menu-about">О нас</div>
             <div class="menu-item" id="menu-contacts">Контакты</div>
         </div>
 
-        <!-- 3. Бокс Проекты -->
         <div id="box-projects" class="info-box hidden">
             <p class="box-text">Пока что ничего нету</p>
             <div class="back-btn to-menu">← Назад</div>
         </div>
 
-        <!-- 4. Бокс О нас -->
         <div id="box-about" class="info-box hidden">
             <p class="box-text">Создатели — крутые программисты / тестеры / идейщики / рекламодатели Ромчик и Мишганчик</p>
             <div class="back-btn to-menu">← Назад</div>
         </div>
 
-        <!-- 5. Бокс Контакты -->
         <div id="box-contacts" class="info-box hidden">
             <p class="box-text">Наши дискорды: <br><span class="highlight">shedevright21</span><br><span class="highlight">telik2777_83452</span></p>
             <div class="back-btn to-menu">← Назад</div>
         </div>
 
-        <!-- 6. Бокс Мессенджера -->
         <div id="box-messenger" class="info-box hidden">
             <div id="messenger-view"></div>
             <div class="back-btn" id="messenger-back-btn">← Выйти из меню</div>
         </div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>

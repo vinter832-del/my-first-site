@@ -1,5 +1,4 @@
-// Инициализация твоей базы Supabase
-const SUPABASE_URL = 'https://supabase.co';
+const SUPABASE_URL = 'https://lswhjvktevtikdnmnvfd.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_bhx6sfmyZOYixc6RNARoeg_6SXEB_2b6ec26a42207908901a88dfb841a100ce643690c7eb1dfbb09206771d371d3a';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -7,7 +6,6 @@ let currentUser = null;
 let activeChatFriend = null;
 let messageSubscription = null;
 
-// Элементы со страницы
 const mainTitle = document.getElementById('main-title');
 const mainMenu = document.getElementById('main-menu');
 const boxProjects = document.getElementById('box-projects');
@@ -16,7 +14,6 @@ const boxContacts = document.getElementById('box-contacts');
 const boxMessenger = document.getElementById('box-messenger');
 const messengerView = document.getElementById('messenger-view');
 
-// Логика переключения экранов
 function showScreen(screen) {
     mainTitle.classList.add('hidden');
     mainMenu.classList.add('hidden');
@@ -42,12 +39,11 @@ document.getElementById('menu-projects').addEventListener('click', () => showScr
 document.getElementById('menu-about').addEventListener('click', () => showScreen(boxAbout));
 document.getElementById('menu-contacts').addEventListener('click', () => showScreen(boxContacts));
 
-// Клик по кнопке Главная теперь реально работает
+// ЗДЕСЬ ИСПРАВЛЕНО: ID строго совпадает с кнопкой в html
 document.getElementById('menu-main').addEventListener('click', () => {
     showScreen(boxMessenger);
     renderMessenger();
 });
-// Логика работы мессенджера
 async function renderMessenger() {
     messengerView.innerHTML = '';
     const session = (await supabase.auth.getSession()).data.session;
