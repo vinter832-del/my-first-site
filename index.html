@@ -2,30 +2,117 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Мой первый сайт</title>
+    <title>Винтер</title>
     <style>
+        * { box-sizing: border-box; }
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-family: Arial, sans-serif;
-            background-color: #111; /* Темный фон */
+            margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; background-color: #0a0a0a;
+            font-family: 'Arial', sans-serif; overflow: hidden; color: #fff;
+        }
+        #content {
+            display: flex; justify-content: center; align-items: center;
+            width: 100%; height: 100%; padding: 20px;
         }
         h1 {
-            font-size: 6rem;
-            color: #ff3333; /* Ярко-красный цвет */
-            text-shadow: 0 0 20px rgba(255, 51, 51, 0.5);
-            user-select: none;
+            font-size: 6rem; font-family: 'Arial Black', sans-serif;
+            color: #ffffff; text-transform: uppercase; letter-spacing: 8px;
+            cursor: pointer; user-select: none;
+            transition: opacity 0.6s ease, transform 0.6s ease;
         }
+        h1:hover { transform: scale(1.05); text-shadow: 0 0 25px rgba(255, 255, 255, 0.4); }
+        
+        .menu-container {
+            display: flex; flex-direction: column; align-items: center; gap: 20px;
+        }
+        .menu-item {
+            font-size: 1.8rem; font-family: 'Arial Black', sans-serif; color: #888888;
+            text-transform: uppercase; letter-spacing: 4px; padding: 10px 40px;
+            cursor: pointer; user-select: none; transition: all 0.3s ease;
+        }
+        .menu-item:hover { color: #ffffff; border-bottom: 1px solid #ffffff; letter-spacing: 6px; }
+
+        .info-box {
+            color: #ffffff; text-align: center; width: 100%; max-width: 500px;
+            padding: 30px; border: 1px solid #333333; background-color: #111111;
+            border-radius: 8px;
+        }
+        .box-text { font-size: 1.2rem; line-height: 1.6; margin-bottom: 20px; }
+        .highlight { color: #888888; font-weight: bold; }
+        .back-btn {
+            font-size: 0.9rem; color: #666666; text-transform: uppercase;
+            letter-spacing: 2px; cursor: pointer; transition: color 0.3s; margin-top: 15px;
+            display: inline-block;
+        }
+        .back-btn:hover { color: #ffffff; }
+
+        .auth-form { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+        input {
+            padding: 12px; background: #222; border: 1px solid #444;
+            color: #fff; border-radius: 6px; font-size: 1rem; outline: none;
+        }
+        input:focus { border-color: #fff; }
+        button {
+            padding: 12px; background: #fff; color: #000; border: none;
+            font-weight: bold; border-radius: 6px; cursor: pointer; font-size: 1rem; transition: background 0.2s;
+        }
+        button:hover { background: #ccc; }
+        .my-id-tag { background: #222; padding: 10px; border-radius: 6px; font-size: 0.9rem; margin-bottom: 15px; border: 1px dashed #444; text-align: center; }
+        .chat-layout { display: flex; flex-direction: column; height: 350px; text-align: left; }
+        .friends-list, .chat-messages { flex: 1; overflow-y: auto; border: 1px solid #333; background: #161616; padding: 10px; border-radius: 6px; margin-bottom: 10px; }
+        .friend-item { padding: 8px; border-bottom: 1px solid #222; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .friend-item:hover { background: #222; }
+        
+        .msg { margin-bottom: 8px; padding: 6px 10px; border-radius: 6px; max-width: 80%; font-size: 0.95rem; }
+        .msg.sent { background: #fff; color: #000; align-self: flex-end; margin-left: auto; }
+        .msg.received { background: #333; color: #fff; align-self: flex-start; }
+        .chat-input-area { display: flex; gap: 8px; }
+        .chat-input-area input { flex: 1; }
+
+        .hidden { display: none !important; }
     </style>
+    <!-- Подключаем официальную библиотеку базы данных -->
+    <script src="https://jsdelivr.net"></script>
 </head>
 <body>
+    <div id="content">
+        <!-- 1. Стартовый экран -->
+        <h1 id="main-title">ВИНТЕР</h1>
 
-    <!-- В этот блок JavaScript добавит надпись -->
-    <div id="content"></div>
+        <!-- 2. Главное меню -->
+        <div id="main-menu" class="menu-container hidden">
+            <div class="menu-item" id="menu-main">Главная</div>
+            <div class="menu-item" id="menu-projects">Проекты</div>
+            <div class="menu-item" id="menu-about">О нас</div>
+            <div class="menu-item" id="menu-contacts">Контакты</div>
+        </div>
 
-    <!-- Подключаем ваш скрипт -->
+        <!-- 3. Бокс Проекты -->
+        <div id="box-projects" class="info-box hidden">
+            <p class="box-text">Пока что ничего нету</p>
+            <div class="back-btn to-menu">← Назад</div>
+        </div>
+
+        <!-- 4. Бокс О нас -->
+        <div id="box-about" class="info-box hidden">
+            <p class="box-text">Создатели — крутые программисты / тестеры / идейщики / рекламодатели Ромчик и Мишганчик</p>
+            <div class="back-btn to-menu">← Назад</div>
+        </div>
+
+        <!-- 5. Бокс Контакты -->
+        <div id="box-contacts" class="info-box hidden">
+            <p class="box-text">Наши дискорды: <br><span class="highlight">shedevright21</span><br><span class="highlight">telik2777_83452</span></p>
+            <div class="back-btn to-menu">← Назад</div>
+        </div>
+
+        <!-- 6. Бокс Мессенджера -->
+        <div id="box-messenger" class="info-box hidden">
+            <div id="messenger-view"></div>
+            <div class="back-btn" id="messenger-back-btn">← Выйти из меню</div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
