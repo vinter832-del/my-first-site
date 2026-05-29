@@ -1,4 +1,4 @@
-const SUPABASE_URL = 'https://lswhjvktevtikdnmnvfd.supabase.co';
+const SUPABASE_URL = 'https://supabase.co';
 const SUPABASE_KEY = 'sb_publishable_bhx6sfmyZOYixc6RNARoeg_6SXEB_2b6ec26a42207908901a88dfb841a100ce643690c7eb1dfbb09206771d371d3a';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -24,47 +24,85 @@ function showScreen(screen) {
     screen.classList.remove('hidden');
 }
 
-mainTitle.addEventListener('click', () => showScreen(mainMenu));
+if (mainTitle) {
+    mainTitle.addEventListener('click', () => showScreen(mainMenu));
+}
 
 document.querySelectorAll('.to-menu').forEach(btn => {
     btn.addEventListener('click', () => showScreen(mainMenu));
 });
 
-document.getElementById('messenger-back-btn').addEventListener('click', () => {
-    if (messageSubscription) supabase.removeChannel(messageSubscription);
-    showScreen(mainMenu);
-});
+const backBtn = document.getElementById('messenger-back-btn');
+if (backBtn) {
+    backBtn.addEventListener('click', () => {
+        if (messageSubscription) supabase.removeChannel(messageSubscription);
+        showScreen(mainMenu);
+    });
+}
 
-document.getElementById('menu-projects').addEventListener('click', () => showScreen(boxProjects));
-document.getElementById('menu-about').addEventListener('click', () => showScreen(boxAbout));
-document.getElementById('menu-contacts').addEventListener('click', () => showScreen(boxContacts));
+const mProj = document.getElementById('menu-projects');
+if (mProj) mProj.addEventListener('click', () => showScreen(boxProjects));
 
-// ЗДЕСЬ ИСПРАВЛЕНО: ID строго совпадает с кнопкой в html
-document.getElementById('menu-main').addEventListener('click', () => {
-    showScreen(boxMessenger);
-    renderMessenger();
-});
+const mAb = document.getElementById('menu-about');
+if (mAb) mAb.addEventListener('click', () => showScreen(boxAbout));
+
+const mCont = document.getElementById('menu-contacts');
+if (mCont) mCont.addEventListener('click', () => showScreen(boxContacts));
+
+const mMain = document.getElementById('menu-main');
+if (mMain) {
+    mMain.addEventListener('click', () => {
+        showScreen(boxMessenger);
+        renderMessenger();
+    });
+}
 async function renderMessenger() {
+    if (!messengerView) return;
     messengerView.innerHTML = '';
-    const session = (await supabase.auth.getSession()).data.session;
+    
+    let session = null;
+    try {
+        const res = await supabase.auth.getSession();
+        session = res.data.session;
+    } catch (e) {
+        console.error(e);
+    }
+    
     currentUser = session ? session.user : null;
 
     if (!currentUser) {
         messengerView.innerHTML = '<div class="auth-form"><h3>Вход / Регистрация</h3><input type="email" id="auth-email" placeholder="Email"><input type="password" id="auth-password" placeholder="Пароль"><input type="text" id="auth-username" placeholder="Никнейм"><button id="btn-login">Войти</button><button id="btn-register" style="background:#222; color:#fff;">Создать аккаунт</button></div>';
-        document.getElementById('btn-login').addEventListener('click', login);
-        document.getElementById('btn-register').addEventListener('click', register);
+        
+        const loginBtn = document.getElementById('btn-login');
+        const regBtn = document.getElementById('btn-register');
+        if (loginBtn) loginBtn.addEventListener('click', login);
+        if (regBtn) regBtn.addEventListener('click', register);
     } else {
-        const { data: profile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+        let profile = null;
+        try {
+            const res = await supabase.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
+            profile = res.data;
+        } catch (e) {
+            console.error(e);
+        }
+        
         messengerView.innerHTML = '<div class="my-id-tag">Вы: <b>' + (profile?.username || 'Юзер') + '</b> | ID: <b>' + (profile?.custom_id || '...') + '</b></div><div class="chat-layout" id="chat-layout-view"><div>Добавить друга по ID:</div><div style="display:flex; gap:5px; margin-bottom:10px;"><input type="text" id="friend-id-input" placeholder="winter_xxxx"><button id="btn-add-friend">+</button></div><div>Друзья и заявки:</div><div class="friends-list" id="friends-list-container">Загрузка...</div></div>';
-        document.getElementById('btn-add-friend').addEventListener('click', sendFriendRequest);
+        
+        const addFriendBtn = document.getElementById('btn-add-friend');
+        if (addFriendBtn) addFriendBtn.addEventListener('click', sendFriendRequest);
         loadFriendsList();
     }
 }
 
 async function register() {
-    const email = document.getElementById('auth-email').value;
-    const password = document.getElementById('auth-password').value;
-    const username = document.getElementById('auth-username').value;
+    const emailInput = document.getElementById('auth-email');
+    const passInput = document.getElementById('auth-password');
+    const userInput = document.getElementById('auth-username');
+    
+    const email = emailInput ? emailInput.value : '';
+    const password = passInput ? passInput.value : '';
+    const username = userInput ? userInput.value : '';
+    
     if(!email || !password || !username) return alert('Заполни поля!');
 
     const { data, error } = await supabase.auth.signUp({ email, password });
@@ -79,15 +117,20 @@ async function register() {
 }
 
 async function login() {
-    const email = document.getElementById('auth-email').value;
-    const password = document.getElementById('auth-password').value;
+    const emailInput = document.getElementById('auth-email');
+    const passInput = document.getElementById('auth-password');
+    
+    const email = emailInput ? emailInput.value : '';
+    const password = passInput ? passInput.value : '';
+    
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) return alert(error.message);
     renderMessenger();
 }
 
 async function sendFriendRequest() {
-    const targetCustomId = document.getElementById('friend-id-input').value.trim();
+    const input = document.getElementById('friend-id-input');
+    const targetCustomId = input ? input.value.trim() : '';
     if(!targetCustomId) return;
 
     const { data: targetProfile } = await supabase.from('profiles').select('id').eq('custom_id', targetCustomId).maybeSingle();
@@ -117,10 +160,13 @@ async function loadFriendsList() {
             if(req.status === 'pending') {
                 item.innerHTML = '<span>Заявка от: <b>' + req.profiles.username + '</b></span> <button id="acc-' + req.id + '">Принять</button>';
                 containerList.appendChild(item);
-                document.getElementById('acc-' + req.id).addEventListener('click', async () => {
-                    await supabase.from('friendships').update({ status: 'accepted' }).eq('id', req.id);
-                    loadFriendsList();
-                });
+                const accBtn = document.getElementById('acc-' + req.id);
+                if (accBtn) {
+                    accBtn.addEventListener('click', async () => {
+                        await supabase.from('friendships').update({ status: 'accepted' }).eq('id', req.id);
+                        loadFriendsList();
+                    });
+                }
             } else {
                 item.innerHTML = '<span>👤 <b>' + req.profiles.username + '</b></span> <span>Чат →</span>';
                 item.addEventListener('click', () => openChatWindow(req.profiles));
@@ -151,14 +197,25 @@ async function loadFriendsList() {
 function openChatWindow(friendProfile) {
     activeChatFriend = friendProfile;
     const layout = document.getElementById('chat-layout-view');
+    if (!layout) return;
+    
     layout.innerHTML = '<div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>Чат: ' + friendProfile.username + '</span><span id="close-chat-btn" style="cursor:pointer;">❌ Выйти</span></div><div class="chat-messages" id="chat-messages-box">Загрузка...</div><div class="chat-input-area"><input type="text" id="chat-msg-input" placeholder="Сообщение..."><button id="btn-send-msg">-></button></div>';
 
-    document.getElementById('close-chat-btn').addEventListener('click', () => {
-        if(messageSubscription) supabase.removeChannel(messageSubscription);
-        renderMessenger();
-    });
-    document.getElementById('btn-send-msg').addEventListener('click', sendMessage);
-    document.getElementById('chat-msg-input').addEventListener('keydown', (e) => { if(e.key === 'Enter') sendMessage(); });
+    const closeChat = document.getElementById('close-chat-btn');
+    if (closeChat) {
+        closeChat.addEventListener('click', () => {
+            if(messageSubscription) supabase.removeChannel(messageSubscription);
+            renderMessenger();
+        });
+    }
+    
+    const sendMsgBtn = document.getElementById('btn-send-msg');
+    if (sendMsgBtn) sendMsgBtn.addEventListener('click', sendMessage);
+    
+    const msgInput = document.getElementById('chat-msg-input');
+    if (msgInput) {
+        msgInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') sendMessage(); });
+    }
 
     loadMessages();
     messageSubscription = supabase.channel('schema-db-changes')
@@ -186,8 +243,8 @@ async function loadMessages() {
 
 async function sendMessage() {
     const input = document.getElementById('chat-msg-input');
-    const text = input.value.trim();
+    const text = input ? input.value.trim() : '';
     if(!text) return;
-    input.value = '';
+    if (input) input.value = '';
     await supabase.from('messages').insert({ sender_id: currentUser.id, receiver_id: activeChatFriend.id, text: text });
 }
